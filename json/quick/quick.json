@@ -1,0 +1,33 @@
+[
+    {
+        "id": 0 ,
+        "name": "Rectangular",
+        "class": "glyphicon glyphicon-th",
+        "disabled": "",
+        "title": "Rectangular"
+    },
+    {   "id": 1,
+        "name": "New",
+        "class": "glyphicon glyphicon-file",
+        "disabled": "",
+        "title": "New project"
+    },
+    {   "id": 2,
+        "name": "Save",
+        "class": "glyphicon glyphicon-save",
+        "disabled": "",
+        "title": "Save all in the project"
+    },
+    {   "id": 3,
+        "name": "Settings",
+        "class": "glyphicon glyphicon-cog",
+        "disabled": "",
+        "title": "Set the path of this application"
+    },
+    {   "id": 4,
+        "name": "Create Trangle",
+        "class": "glyphicon glyphicon-play btnstart",
+        "disabled": "",
+        "title": "Trangle"
+    }
+]

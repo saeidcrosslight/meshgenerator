@@ -1,0 +1,54 @@
+[
+    {
+        "name": "link",
+        "list": [
+        {
+            "id": 0 ,
+            "name": "delete",
+            "disabled": ""
+        },
+        {
+            "id": 1 ,
+            "name": "update",
+            "disabled": "disabled"
+        }]
+    },{
+        "name": "paper",
+        "list": [
+        {
+            "id": 2 ,
+            "name": "test",
+            "disabled": "disabled"
+        },
+        {
+            "id": 3 ,
+            "name": "testmenu",
+            "disabled": "disabled"
+        }]
+    },
+    {
+        "name": "component",
+        "list": [
+            {
+                "id": 4 ,
+                "name": "delete",
+                "disabled": ""
+            },
+            {
+                "id": 5 ,
+                "name": "change component type",
+                "disabled": ""
+            },
+            {
+                "id": 6 ,
+                "name": "modify component data",
+                "disabled": ""
+            },
+            {
+                "id": 7 ,
+                "name": "rotate component",
+                "disabled": ""
+            }]
+    }
+
+]
