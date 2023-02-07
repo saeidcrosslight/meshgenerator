@@ -23,6 +23,7 @@ angular
                             this.showStartPage = true;
                             this.addedCircuitComponents = [];
                             this.createProject = createProject;
+                            this.inside = inside;
                             this.newPath = "";
                             this.projectName="";
                             this.init = _init;
@@ -116,6 +117,11 @@ angular
                             $rootScope.$apply();
                         }
                     };
+
+                    const inside = (point, rect) => {
+                        debugger;
+                         return point.x > rect.left && point.x < rect.right && point.y > rect.top && point.y < rect.bottom
+                        };
 
                     let saveCreatedStructure = function (projectPath, projectName, data, fileExtension) {
                         debugger;
