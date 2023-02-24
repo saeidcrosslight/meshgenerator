@@ -5,95 +5,39 @@ angular.module('drawingTool.controller', [])
         let minispice = $rootScope.minispice;
         // $rootScope.boxCorners = [];
         $rootScope.rectCorners = {left: 0, right:0, top:0, bottom:0};
+        $rootScope.boxCorners = [];
          $rootScope.canvas = new fabric.Canvas('drawingContainer',{
             width: 1500,
             height: 2000,
             backgroundColor: 'gray'
         });
-        $scope.rectangular = {width:0, height:0, numberOfBoxes:0}
+        $rootScope.rectangular = {width:0, height:0, numberOfBoxes:0}
         $rootScope.points = [];
         
 
-        $scope.drawRectangular = function(){
+        $rootScope.drawRectangular = function(){
             debugger;
             for(let i=0; i<$scope.rectangular.numberOfBoxes; i++){
                 var rect = new fabric.Rect({
-                    left: 0,
-                    top: i*$scope.rectangular.height,
-                    width: $scope.rectangular.width,
-                    height: $scope.rectangular.height,
+                    left: 200,
+                    top: 400+ i*$rootScope.rectangular.height,
+                    width: $rootScope.rectangular.width,
+                    height: $rootScope.rectangular.height,
                     stroke: 'black',
                     strokeWidth: 2,
                     fill: 'rgba(0,0,0,0)'
                     });
                     console.log(rect);
                     debugger;
-                    
-            //         let a=[]
             $rootScope.canvas.add(rect);
-            //$rootScope.rectCorners = {left: rect.left, right:rect.width+rect.left, top:rect.top, bottom:rect.top+rect.height};
-            if(rect.left<$rootScope.rectCorners.left){
-                $rootScope.rectCorners.left = rect.left
+            let coordinations = []
+            coordinations.push(rect.aCoords.br)
+            coordinations.push(rect.aCoords.bl)
+            coordinations.push(rect.aCoords.tl)
+            coordinations.push(rect.aCoords.tr)
+            $rootScope.boxCorners.push({index: i, left:rect.left, right: rect.width+rect.left, top: rect.top, bottom: rect.top+rect.height, points:[], coords: coordinations})
+            console.log($rootScope.boxCorners)
             }
-            if(rect.width+rect.left>$rootScope.rectCorners.right){
-                $rootScope.rectCorners.right = rect.width+rect.left
-            }
-            if(rect.top<$rootScope.rectCorners.top){
-                $rootScope.rectCorners.top = rect.top
-            }
-            if(rect.top+rect.height>$rootScope.rectCorners.bottom){
-                $rootScope.rectCorners.bottom = rect.top+rect.height
-            }
-            debugger;
-            console.log($rootScope.rectCorners);
-            //     debugger;
-            //     let b = [];
-            //     b.push(rect.aCoords.tl.x)
-            //     b.push(rect.aCoords.tl.y)
-            //     a.push(b)
-            //     let c = [];
-            //     c.push(rect.aCoords.tr.x)
-            //     c.push(rect.aCoords.tr.y)
-            //     a.push(c)
-            //     let d = [];
-            //     d.push(rect.aCoords.bl.x)
-            //     d.push(rect.aCoords.bl.y)
-            //     a.push(d)
-            //     let e = [];
-            //     e.push(rect.aCoords.br.x)
-            //     e.push(rect.aCoords.br.y)
-            //     a.push(e)
-            //     console.log(a);
-            // $rootScope.boxCorners = a;
-
-                //$rootScope.$rootScope.canvas.push(canvas.)
-            }
-            //console.log($rootScope.canvas);
-
-            // var rect = new fabric.Rect({
-            //     left: 0,
-            //     top: 0,
-            //     width: $scope.rectangular.width,
-            //     height: $scope.rectangular.height,
-            //     stroke: 'black',
-            //     strokeWidth: 2,
-            //     fill: 'rgba(0,0,0,0)'
-            //     });
-            //     console.log(rect);
-            // $rootScope.canvas.add(rect);
-            // debugger;
-            // console.log($rootScope.canvas)
-            // for(var i=0;i<$rootScope.points.length; i++){
-            //     circ=new fabric.Circle({
-            //         left:$rootScope.points[i].x,
-            //         top:$rootScope.points[i].y,
-            //         radius:3,
-            //         stroke:'red',
-            //         strokeWidth:1,
-            //         fill:'red'
-            //     });
-            //  $rootScope.canvas.add(circ);
-            // }
         };
 
         $rootScope.canvas.on('mouse:down', function(event){
@@ -103,8 +47,8 @@ angular.module('drawingTool.controller', [])
              //point.push(event.absolutePointer.x);
              //point.push(event.absolutePointer.y);
              debugger;
-             console.log(minispice.inside(event.absolutePointer, $rootScope.rectCorners))
-            if(minispice.inside(event.absolutePointer, $rootScope.rectCorners)){
+             //console.log(minispice.inside(event.absolutePointer, $rootScope.rectCorners))
+            if(minispice.inside(event.absolutePointer)){
                 debugger;
             $rootScope.points.push(event.absolutePointer);
                console.log(event.e.clientX,event.e.clientY);

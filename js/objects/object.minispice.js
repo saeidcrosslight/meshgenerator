@@ -118,9 +118,17 @@ angular
                         }
                     };
 
-                    const inside = (point, rect) => {
+                    const inside = (point) => {
                         debugger;
-                         return point.x > rect.left && point.x < rect.right && point.y > rect.top && point.y < rect.bottom
+                        let isInside = false
+                        for (let i=0; i<$rootScope.boxCorners.length; i++){
+                            isInside = point.x > $rootScope.boxCorners[i].left && point.x < $rootScope.boxCorners[i].right && point.y > $rootScope.boxCorners[i].top && point.y < $rootScope.boxCorners[i].bottom;
+                            if(isInside){
+                                $rootScope.boxCorners[i].points.push(point);
+                                return isInside
+                            }
+                        }
+                        return isInside
                         };
 
                     let saveCreatedStructure = function (projectPath, projectName, data, fileExtension) {
@@ -146,15 +154,30 @@ angular
                         if (appPath.length > 0){
                             let filePath1 = appPath + "\\" + "fort.12";
                             let filePath2 = appPath + "\\" + "fort.13";
-                            //data = formatCircuitData(data);
-                            //data = JSON.stringify(data);
-                            data = formatPointsData(data);
-                            file.writeallsync(filePath1, data);
+                            let filePath3 = appPath + "\\" + "fort.22";
+                            let filePath4 = appPath + "\\" + "fort.23";
+                            let recPath1 = appPath + "\\" + "rec.txt";
+                            let recPath2 = appPath + "\\" + "rec2.txt";
+                            let data1 = formatPointsData($rootScope.boxCorners[0].points);
+                            let data2 = formatPointsData($rootScope.boxCorners[1].points);
+                            //next write corner boxes in rec.txt and rec2.txt
+                            let rec1 = formatPointsData($rootScope.boxCorners[0].coords);
+                            let rec2 = formatPointsData($rootScope.boxCorners[1].coords);
+  
+                            //data = formatPointsData(data);
+                            file.writeallsync(filePath1, data1);
                             file.writeallsync(filePath2, "");
+                            file.writeallsync(filePath3, data2);
+                            file.writeallsync(filePath4, "");
+
+                            file.writeallsync(recPath1, rec1);
+                            file.writeallsync(recPath2, rec2);
+
                             var sb = new String();
                             //sb = projectPath.split("\\")[0] + "\r\n";
                             sb += "cd /D \"" + appPath + "\"\r\n";
-                            sb += "call deltri.exe < ret.txt";
+                            sb += "call deltri.exe < ret.txt" + "\"\r\n";;
+                            sb += "call deltri.exe < ret2.txt";
                             file.writeallsync(appPath + "\\merg.bat", sb);//temp.bat
                             // var child_process = require('child_process');
                             // child_process.exec(appPath + "\\merg.bat", function(error, stdout, stderr) {
@@ -173,8 +196,12 @@ angular
 
                     let createNewTrangles = function (appPath, points) {
                         console.log(points);
+                        console.log($rootScope.boxCorners[0])
+                        console.log($rootScope.boxCorners[1])
+
                         debugger;
                         let trianglesFilePath = appPath+'\\out2.txt';
+
                         let trianglesFileContent =  file.readallsync(trianglesFilePath);
                         trianglesFileContent = trianglesFileContent.replace(/\s+/g, ' ').trim();
                         console.log(trianglesFileContent);
@@ -191,11 +218,15 @@ angular
                         let secondPoint;
                         let thirdPoint;
                         $rootScope.canvas.remove(...$rootScope.canvas.getObjects());
+                        $rootScope.drawRectangular();
 
                         for(let i=0; i<newArray.length;i++){
-                            firstPoint = points[newArray[i][0]-1];
-                            secondPoint = points[newArray[i][1]-1];
-                            thirdPoint = points[newArray[i][2]-1];
+                            if(newArray[i].includes("0")){
+                                continue;
+                            }
+                            firstPoint = $rootScope.boxCorners[0].points[newArray[i][0]-1];
+                            secondPoint = $rootScope.boxCorners[0].points[newArray[i][1]-1];
+                            thirdPoint = $rootScope.boxCorners[0].points[newArray[i][2]-1];
                             let line1 = new fabric.Line([firstPoint.x, firstPoint.y, secondPoint.x, secondPoint.y], {
                                 stroke: 'red',
                                 strokeWidth: 1
@@ -213,6 +244,49 @@ angular
                             $rootScope.canvas.add(line3);
                         }
 
+                        debugger;
+                        let trianglesFilePath2 = appPath+'\\out2_2.txt';
+
+                        let trianglesFileContent2 =  file.readallsync(trianglesFilePath2);
+                        trianglesFileContent2 = trianglesFileContent2.replace(/\s+/g, ' ').trim();
+                        console.log(trianglesFileContent2);
+                        // trianglesFileContent = trianglesFileContent.replace(/\s/g, "");
+                        trianglesFileContent2 = trianglesFileContent2.split(' ');
+                        let splitArray2 = [];
+                        let newArray2 = [];
+                        while(trianglesFileContent2.length>0){
+                            splitArray2 = trianglesFileContent2.splice(0,3);
+                            newArray2.push(splitArray2);
+                        }
+                        console.log(newArray2);
+                        let firstPoint2;
+                        let secondPoint2;
+                        let thirdPoint2;
+                        //$rootScope.canvas.remove(...$rootScope.canvas.getObjects());
+
+                        for(let i=0; i<newArray2.length;i++){
+                            if(newArray2[i].includes("0")){
+                                continue;
+                            }
+                            firstPoint2 = $rootScope.boxCorners[1].points[newArray2[i][0]-1];
+                            secondPoint2 = $rootScope.boxCorners[1].points[newArray2[i][1]-1];
+                            thirdPoint2 = $rootScope.boxCorners[1].points[newArray2[i][2]-1];
+                            let line1 = new fabric.Line([firstPoint2.x, firstPoint2.y, secondPoint2.x, secondPoint2.y], {
+                                stroke: 'red',
+                                strokeWidth: 1
+                            })
+                            let line2 = new fabric.Line([secondPoint2.x, secondPoint2.y, thirdPoint2.x, thirdPoint2.y], {
+                                stroke: 'red',
+                                strokeWidth: 1
+                            })
+                            let line3 = new fabric.Line([thirdPoint2.x, thirdPoint2.y, firstPoint2.x, firstPoint2.y], {
+                                stroke: 'red',
+                                strokeWidth: 1
+                            })
+                            $rootScope.canvas.add(line1);
+                            $rootScope.canvas.add(line2);
+                            $rootScope.canvas.add(line3);
+                        }
                     };
 
 
