@@ -176,7 +176,7 @@ angular
                             var sb = new String();
                             //sb = projectPath.split("\\")[0] + "\r\n";
                             sb += "cd /D \"" + appPath + "\"\r\n";
-                            sb += "call deltri.exe < ret.txt" + "\"\r\n";;
+                            sb += "call deltri.exe < ret.txt" + "\"\r\n";
                             sb += "call deltri.exe < ret2.txt";
                             file.writeallsync(appPath + "\\merg.bat", sb);//temp.bat
                             // var child_process = require('child_process');

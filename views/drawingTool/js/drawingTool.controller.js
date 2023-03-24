@@ -13,6 +13,19 @@ angular.module('drawingTool.controller', [])
         });
         $rootScope.rectangular = {width:0, height:0, numberOfBoxes:0}
         $rootScope.points = [];
+
+        const pointsInBetween = (startPoint, endPoint, numPoints)=>{
+            const stepSize = 1 / (numPoints + 1);
+
+            // Generate the intermediate points
+            const intermediatePoints = [];
+            for (let i = 1; i <= numPoints; i++) {
+            const x = startPoint.x + i * stepSize * (endPoint.x - startPoint.x);
+            const y = startPoint.y + i * stepSize * (endPoint.y - startPoint.y);
+            intermediatePoints.push({ x, y });
+            }
+            return intermediatePoints;
+        }
         
 
         $rootScope.drawRectangular = function(){
@@ -30,12 +43,19 @@ angular.module('drawingTool.controller', [])
                     console.log(rect);
                     debugger;
             $rootScope.canvas.add(rect);
-            let coordinations = []
+            let coordinations = [];
+            let points = pointsInBetween(rect.aCoords.tl, rect.aCoords.tr, 10).concat(pointsInBetween(rect.aCoords.bl, rect.aCoords.br, 10));
+            points = points.concat(pointsInBetween(rect.aCoords.tl, rect.aCoords.bl, 10));
+            points = points.concat(pointsInBetween(rect.aCoords.tr, rect.aCoords.br, 10));
+            points.push(rect.aCoords.tl)
+            points.push(rect.aCoords.tr)
+            points.push(rect.aCoords.bl)
+            points.push(rect.aCoords.br)
             coordinations.push(rect.aCoords.br)
             coordinations.push(rect.aCoords.bl)
             coordinations.push(rect.aCoords.tl)
             coordinations.push(rect.aCoords.tr)
-            $rootScope.boxCorners.push({index: i, left:rect.left, right: rect.width+rect.left, top: rect.top, bottom: rect.top+rect.height, points:[], coords: coordinations})
+            $rootScope.boxCorners.push({index: i, left:rect.left, right: rect.width+rect.left, top: rect.top, bottom: rect.top+rect.height, points:points, coords: coordinations})
             console.log($rootScope.boxCorners)
             }
         };
