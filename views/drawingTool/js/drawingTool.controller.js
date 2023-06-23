@@ -9,8 +9,37 @@ angular.module('drawingTool.controller', [])
          $rootScope.canvas = new fabric.Canvas('drawingContainer',{
             width: 1500,
             height: 2000,
-            backgroundColor: 'gray'
+            // selection: false,
+            // lockMovementX: true,
+            // lockMovementY: true,
+            backgroundColor: '#fff'
         });
+        // var gridsize = 5;
+        // for(var x=1;x<($rootScope.canvas.width/gridsize);x++){
+        //         $rootScope.canvas.add(new fabric.Line([100*x, 0, 100*x, 1500],{ stroke: "#000000", strokeWidth: 1, selectable:false, strokeDashArray: [5, 5]}));
+        //         $rootScope.canvas.add(new fabric.Line([0, 100*x, 2000, 100*x],{ stroke: "#000000", strokeWidth: 1, selectable:false, strokeDashArray: [5, 5]}));
+        //     }
+        $rootScope.canvas.on('object:moving', function (event) {
+            event.target.setCoords(); //update the object's coordinates
+          
+            //iterate through all objects on canvas
+            $rootScope.canvas.forEachObject(function (obj) {
+              if (obj === event.target) return; //skip the current object
+          
+              //check if the current object overlaps with any other object
+              if (event.target.isContainedWithinObject(obj) || event.target.intersectsWithObject(obj)) {
+                event.target.set({
+                  left: event.target.lastLeft, //move object back to original position
+                  top: event.target.lastTop
+                });
+                event.target.setCoords();
+                event.target.set('padding', 0); //set padding to 0 to remove gap
+              }
+            });
+          
+            event.target.lastLeft = event.target.left; //save current position for future reference
+            event.target.lastTop = event.target.top;
+          });
         $rootScope.rectangular = {width:0, height:0, numberOfBoxes:0}
         $rootScope.points = [];
 
@@ -26,7 +55,11 @@ angular.module('drawingTool.controller', [])
             }
             return intermediatePoints;
         }
-        
+
+
+        $rootScope.removePolygonClickEvent = function() {
+            $rootScope.canvas.off('mouse:down');
+        }
 
         $rootScope.drawRectangular = function(){
             debugger;
@@ -60,30 +93,136 @@ angular.module('drawingTool.controller', [])
             }
         };
 
-        $rootScope.canvas.on('mouse:down', function(event){
-            console.log(event.absolutePointer);
-            debugger;
-            let point = [];
-             //point.push(event.absolutePointer.x);
-             //point.push(event.absolutePointer.y);
-             debugger;
-             //console.log(minispice.inside(event.absolutePointer, $rootScope.rectCorners))
-            if(minispice.inside(event.absolutePointer)){
-                debugger;
-            $rootScope.points.push(event.absolutePointer);
-               console.log(event.e.clientX,event.e.clientY);
-                   circ=new fabric.Circle({
-                       left:event.absolutePointer.x,
-                       top:event.absolutePointer.y,
-                       radius:3,
-                       stroke:'red',
-                       strokeWidth:1,
-                       fill:'red'
-                   });
-                $rootScope.canvas.add(circ);
+        $rootScope.drawPolygonWithClick = function(canvas) {
+             $rootScope.polygonPoints = []; // array to hold the polygon points
+          
+            // event listener for canvas click
+            $rootScope.canvas.on('mouse:down', function(event) {
+              var pointer = $rootScope.canvas.getPointer(event.e);
+          
+              // add point to array and draw a circle at the point
+              var point = { x: pointer.x, y: pointer.y };
+              $rootScope.polygonPoints.push(point);
+              var circle = new fabric.Circle({
+                radius: 3,
+                fill: 'red',
+                left: point.x,
+                top: point.y
+              });
+              $rootScope.canvas.add(circle);
+          
+              // if there are more than 2 points, draw a polygon
+            });
+        };
+
+        $rootScope.generatePolygon = function(){
+            if ($rootScope.polygonPoints.length >= 3) {
+                $rootScope.canvas.forEachObject(function(obj) {
+                    if (obj instanceof fabric.Circle) {
+                        $rootScope.canvas.remove(obj);
+                    }
+                });
+                var newPolygon = new fabric.Polygon($rootScope.polygonPoints, {
+                  fill: 'rgba(255, 0, 0, 0.5)',
+                  stroke: 'black',
+                  lockScalingX: true,
+                  lockScalingY: true,
+                //   lockMovementX: true,
+                //   lockMovementY: true,
+                  strokeWidth: 1
+                });
+
+
+
+
+
+
+
+                ///////////////////////////////////////////////
+//                 if($rootScope.canvas.getObjects().length>0){
+// // Assume that `canvas` is a Fabric.js canvas instance, and `newPolygon` is a newly added polygon.
+
+// // Calculate the distance between the new polygon and all existing polygons on the canvas.
+// let minDistance = Infinity;
+// let closestNeighbor = null;
+// $rootScope.canvas.getObjects().forEach((obj) => {
+//   if (obj === newPolygon) {
+//     return;
+//   }
+//   const distance = Math.sqrt((obj.left - newPolygon.left) ** 2 + (obj.top - newPolygon.top) ** 2);
+//   if (distance < minDistance) {
+//     minDistance = distance;
+//     closestNeighbor = obj;
+//   }
+// });
+
+// // Calculate the distance between the closest neighbor and the new polygon.
+// const newPolygonBoundingRect = newPolygon.getBoundingRect();
+// let outerBoundaryDistance = 0;
+// if (!newPolygonBoundingRect.intersectsWithObject(closestNeighbor)) {
+//   const neighborBoundingRect = closestNeighbor.getBoundingRect();
+//   outerBoundaryDistance = neighborBoundingRect.distanceFromObject(newPolygonBoundingRect);
+// }
+
+// // Move the new polygon towards the closest neighbor.
+// const movementVector = {
+//   x: newPolygon.left - closestNeighbor.left,
+//   y: newPolygon.top - closestNeighbor.top,
+// };
+// const movementDistance = outerBoundaryDistance - minDistance;
+// const movementMagnitude = movementDistance / Math.sqrt(movementVector.x ** 2 + movementVector.y ** 2);
+// const movementOffset = {
+//   x: movementVector.x * movementMagnitude,
+//   y: movementVector.y * movementMagnitude,
+// };
+// newPolygon.set({
+//   left: newPolygon.left + movementOffset.x,
+//   top: newPolygon.top + movementOffset.y,
+// });
+
+
+
+
+//                 }
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+                $rootScope.canvas.add(newPolygon);
+                $rootScope.canvas.renderAll();
             }
-           });
-        
+            $rootScope.polygonPoints = [];
+        };
+
+
+        $rootScope.addInsidePoints = function(){ 
+            $rootScope.canvas.on('mouse:down', function(event){
+                console.log(event.absolutePointer);
+                debugger;
+                let point = [];
+                //point.push(event.absolutePointer.x);
+                //point.push(event.absolutePointer.y);
+                debugger;
+                //console.log(minispice.inside(event.absolutePointer, $rootScope.rectCorners))
+                if(minispice.inside(event.absolutePointer)){
+                    debugger;
+                $rootScope.points.push(event.absolutePointer);
+                console.log(event.e.clientX,event.e.clientY);
+                    circ=new fabric.Circle({
+                        left:event.absolutePointer.x,
+                        top:event.absolutePointer.y,
+                        radius:3,
+                        stroke:'red',
+                        strokeWidth:1,
+                        fill:'red'
+                    });
+                    circ.lockMovement = true; // Lock movement
+                    circ.lockScaling = true; // Lock scaling
+                    $rootScope.canvas.add(circ);
+                }
+            });
+        }
 
         //create a rectangle object
         // var rect = new fabric.Rect({

@@ -29,5 +29,23 @@
         "class": "glyphicon glyphicon-play btnstart",
         "disabled": "",
         "title": "Trangle"
+    },
+    {   "id": 5,
+        "name": "CreatePoints",
+        "class": "glyphicon glyphicon-star-empty",
+        "disabled": "",
+        "title": "CreatePoints"
+    },
+    {   "id": 6,
+        "name": "DrawPolygon",
+        "class": "glyphicon glyphicon-certificate",
+        "disabled": "",
+        "title": "DrawPolygon"
+    },
+    {   "id": 7,
+    "name": "stopPoints",
+    "class": "glyphicon glyphicon-pause",
+    "disabled": "",
+    "title": "stopPoints"
     }
-]
+    ]

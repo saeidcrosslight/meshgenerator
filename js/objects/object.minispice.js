@@ -29,6 +29,9 @@ angular
                             this.init = _init;
                             this.saveCreatedStructure = saveCreatedStructure;
                             this.saveNewCreatedStructure = saveNewCreatedStructure;
+                            this.drawPolygon = drawPolygon;
+                            this.generatePolygon = generatePolygon;
+                            this.stopPoints = stopPoints;
                             this.createNewTrangles = createNewTrangles;
                             this.formatCircuitData = formatCircuitData;
                             this.enableSaveButton = enableSaveButton;
@@ -109,6 +112,17 @@ angular
                                 file.writeallsync(projectPath + "\\" + projectName + "." + fileType, "");
                             });
                         }
+                    };
+
+                    const drawPolygon = function(){
+                        $rootScope.drawPolygonWithClick();
+                    };
+
+                    const generatePolygon = function(){
+                        $rootScope.generatePolygon();
+                    };
+                    const stopPoints = function(){
+                        $rootScope.removePolygonClickEvent();
                     };
 
                     let enableSaveButton = function () {

@@ -66,6 +66,17 @@ angular.module('quick.controller', [])
                     minispice.saveNewCreatedStructure(minispice.appPath, $rootScope.points)
                 },
 
+                createPolygon = function() {
+                    minispice.drawPolygon();
+                },
+
+                generatePolygon = function(){
+                    minispice.generatePolygon();
+                },
+                stopPoints = function(){
+                    minispice.stopPoints();
+                },
+
                 createTrangles = function(){
                     minispice.createNewTrangles(minispice.appPath, $rootScope.points);
                 }
@@ -188,8 +199,17 @@ angular.module('quick.controller', [])
                             userSettingFunction(minispice, '#appPathFolder_MeshGenerator', "input[ng-model='minispice.appPath']", "/GUI/HTML/general/manual.html");
                         break;
                         case 4: //Create triangle
-                       createTrangles();
-                    break;
+                            createTrangles();
+                            break;
+                       case 5: //Create polygon points
+                            createPolygon();
+                        break;
+                        case 6: //Create polygon points
+                            generatePolygon();
+                        break;
+                        case 7: //Create polygon points
+                            stopPoints();
+                        break;
                     }
                 };
 
