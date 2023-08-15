@@ -32,6 +32,7 @@ angular
                             this.drawPolygon = drawPolygon;
                             this.generatePolygon = generatePolygon;
                             this.stopPoints = stopPoints;
+                            this.toggleDrawRectagle = toggleDrawRectagle;
                             this.createNewTrangles = createNewTrangles;
                             this.formatCircuitData = formatCircuitData;
                             this.enableSaveButton = enableSaveButton;
@@ -124,6 +125,10 @@ angular
                     const stopPoints = function(){
                         $rootScope.removePolygonClickEvent();
                     };
+
+                    const toggleDrawRectagle = () => {
+                     $rootScope.isDrawingRect = !$rootScope.isDrawingRect;  
+                    }
 
                     let enableSaveButton = function () {
                         if(this.papers[0].components.length > 0 && this.newPath.length > 0 && this.quickMenus[4].disabled === "disabled"){

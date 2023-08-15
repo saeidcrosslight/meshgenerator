@@ -43,9 +43,9 @@
         "title": "DrawPolygon"
     },
     {   "id": 7,
-    "name": "stopPoints",
+    "name": "drawRect",
     "class": "glyphicon glyphicon-pause",
     "disabled": "",
-    "title": "stopPoints"
+    "title": "drawRect"
     }
     ]

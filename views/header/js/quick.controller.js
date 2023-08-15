@@ -73,8 +73,11 @@ angular.module('quick.controller', [])
                 generatePolygon = function(){
                     minispice.generatePolygon();
                 },
-                stopPoints = function(){
+                toggleDrawRectagle = function(){
                     minispice.stopPoints();
+                },
+                toggleDrawRectagle = function(){
+                    minispice.toggleDrawRectagle();
                 },
 
                 createTrangles = function(){
@@ -207,8 +210,8 @@ angular.module('quick.controller', [])
                         case 6: //Create polygon points
                             generatePolygon();
                         break;
-                        case 7: //Create polygon points
-                            stopPoints();
+                        case 7: //draw rect
+                            toggleDrawRectagle();
                         break;
                     }
                 };
