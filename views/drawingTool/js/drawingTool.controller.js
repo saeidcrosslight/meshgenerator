@@ -281,7 +281,7 @@ angular.module('drawingTool.controller', [])
         ////SHould we use rectangles here??????? it seems that unsave corner are showing up!!!!!!!!!!!!!!
         corners.forEach(function (corner) {
           debugger
-          adjust_pt_close_to_polygon_edge(mousePos, corner, 50)
+          adjust_pt_close_to_polygon_edge(mousePos, corner.shapePoints, 50)
 
           // if (object.type === 'rect') {
           //   debugger
@@ -389,18 +389,18 @@ angular.module('drawingTool.controller', [])
           debugger
           for (let i = 0; i < corners.length; i++) {
             for (let j = 0; j < rectCorners.length; j++) {
-              if (polywind(corners[i], rectCorners[j]) === 1 || polywind(corners[i], rectCorners[j]) === -1) {
+              if (polywind(corners[i].shapePoints, rectCorners[j]) === 1 || polywind(corners[i].shapePoints, rectCorners[j]) === -1) {
                 $rootScope.canvas.remove(rect);
                 $rootScope.canvas.renderAll();
                 rectangles.pop();
                 return;
               }
-              console.log(polywind(corners[i], rectCorners[j]))
+              console.log(polywind(corners[i].shapePoints, rectCorners[j]))
             }
           }
-          corners.push(rectCorners);
+          corners.push({shapePoints: rectCorners, addedPoints: []}); //shapePoints are for the corners of the shapes and addedPoints are the one's added by the user by clicking om the edeges.
         } else {
-          corners.push(rectCorners);
+          corners.push({shapePoints: rectCorners, addedPoints: []});
         }
       }
       isDown = false;
