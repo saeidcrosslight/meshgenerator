@@ -52,7 +52,8 @@ angular.module('drawingTool.controller', [])
 
     var rect, isDown, origX, origY;
     const rectangles = [];
-    const corners = [];
+    const corners = []; // added 
+    // const addedCricleToEdge = [];
     let rectCorners = [];
 
 
@@ -186,18 +187,99 @@ angular.module('drawingTool.controller', [])
 
 
 
+    // function adjust_pt_close_to_polygon_edge(targetPt, polyPt, threshold) {
+    //   /*20230812 by Nancy, to determine if a targetPt is close to any edge of a polygon(defined by a point sequence of polypt)
+    //   move targetPt to the closest edge with distance less than threshold and the tagetPt should lie within the range of the edge;
+    //   if no edge was found matching with the above conditions, calculate the distance between targetPt and each corner point
+    //   of the polygon, if the closest one is less than threshold, then move targetPt to the closest corner point.*/
+
+    //   var tflag = false;//if targetPt is found on any edge or moved to any edge ,set this flag=true 
+    //   var closest_dist = 1000000000000000;//record the closest distance between target point and each polygon edge 
+    //   var closest_edge_index = -1;//record the closest edge index 
+
+    //   //for each edge of the polygon, find the closest edge to targetPt(distance<thresold and targetPt within edge range) 
+    //   for (var i = 0; i < polyPt.length; i++) {
+    //     var sp = polyPt[i];
+    //     var ep = polyPt[0];
+    //     if (i < polyPt.length - 1)
+    //       ep = polyPt[i + 1];
+
+    //     const rp = isPointCloseToEdge(targetPt, sp, ep, threshold);
+    //     if (rp == 0 || rp == 1) {//if the targetPt is right one edge or close to edge
+    //       var adjustedPt = movePointOntoLine(targetPt, sp, ep);//get the adjusted point if move onto edge
+    //       if (isPointInLineRange(adjustedPt, sp, ep)) {//judge if adjusted point lies within the range of current edge
+    //         var distance = pointToLineDistance(targetPt, sp, ep);//get the distance between targetPt and current edge
+    //         if (distance < closest_dist) {
+    //           closest_dist = distance;
+    //           closest_edge_index = i;
+    //         }
+    //         tflag = true;
+    //       }
+    //     }
+    //   }
+
+    //   if (tflag && closest_edge_index > -1) {//if found the closest edge, then move targetPt onto this edge
+    //     var startPt = polyPt[closest_edge_index];
+    //     var endPt = startPt;
+    //     if (closest_edge_index == polyPt.length - 1)
+    //       endPt = polyPt[0];
+    //     else
+    //       endPt = polyPt[closest_edge_index + 1];
+    //     var adjustedPt = movePointOntoLine(targetPt, startPt, endPt);
+    //     targetPt.x = adjustedPt[0];
+    //     targetPt.y = adjustedPt[1];
+    //     var circle = new fabric.Circle({ radius: 5, left: targetPt.x - 5, top: targetPt.y - 5, fill: 'red' });
+    //     $rootScope.canvas.add(circle);
+    //     // $rootScope.canvas.renderAll();
+    //     //drawPoint(context,adjustedPt[0],adjustedPt[1],"","#00F",psize);
+    //   } else {//if didn't find any edge close to targetPt,judge for every corner to see if any corner point is close to targetPt
+    //     for (i = 0; i < polyPt.length; i++) {
+    //       var pt1 = [polyPt[i].x, polyPt[i].y];
+    //       var pt2 = [targetPt.x, targetPt.y];
+    //       var dist = calculateDistance(pt1, pt2);
+    //       if (dist < threshold) {//move target point to the corner
+    //         targetPt.x = pt1[0];
+    //         targetPt.y = pt1[1];
+    //         //drawPoint(context,pt1[0],pt1[1],"","#00F",psize);
+    //         var circle = new fabric.Circle({ radius: 5, left: targetPt.x - 5, top: targetPt.y - 5, fill: 'red' });
+    //         // $rootScope.canvas.add(circle);
+    //         $rootScope.canvas.add(circle);
+    //         // $rootScope.canvas.renderAll();
+    //         break;
+    //       }
+    //     }
+    //   }
+
+
+    // }
+
     function adjust_pt_close_to_polygon_edge(targetPt, polyPt, threshold) {
-      /*20230812 by Nancy, to determine if a targetPt is close to any edge of a polygon(defined by a point sequence of polypt)
+      /*20230812 by NancyQ, to determine if a targetPt is close to any edge of a polygon(defined by a point sequence of polypt)
       move targetPt to the closest edge with distance less than threshold and the tagetPt should lie within the range of the edge;
       if no edge was found matching with the above conditions, calculate the distance between targetPt and each corner point
-      of the polygon, if the closest one is less than threshold, then move targetPt to the closest corner point.*/
+      of the polygon, if the closest one is less than threshold, then move targetPt to the closest corner point.
+      //update 20230824:return edge number of targetPt:
+      if it deoesn't fall on any edge of the given polygon, return -1,
+      if it falls right on the corner, return the corner point number(0 to polyPt.size-1); 
+      if it's close and moved to any corner point, return the corner point number(0 to polyPt.size-1); 
+      if it's close and moved to any side of polyPt, return the start corner point's number of this side + 0.5, for example, if it 
+      falls on the side between point 0 and point 1 of polyPt, return 0.5 */
 
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //step1: to determine if targetPt falls right on one of the corners of polyPt, if it does, return the corner index
+      for (var i = 0; i < polyPt.length; i++) {
+        if (targetPt.x == polyPt[i].x && targetPt.y == polyPt[i].y)
+          return i;
+      }
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //step2: to determine if targetPt is close to any side of the polygon
       var tflag = false;//if targetPt is found on any edge or moved to any edge ,set this flag=true 
       var closest_dist = 1000000000000000;//record the closest distance between target point and each polygon edge 
       var closest_edge_index = -1;//record the closest edge index 
 
-      //for each edge of the polygon, find the closest edge to targetPt(distance<thresold and targetPt within edge range) 
-      for (var i = 0; i < polyPt.length; i++) {
+      //for each side of the polygon, find the closest side to targetPt(distance<thresold and targetPt within etargetPtdge range) 
+      for (i = 0; i < polyPt.length; i++) {
         var sp = polyPt[i];
         var ep = polyPt[0];
         if (i < polyPt.length - 1)
@@ -227,10 +309,9 @@ angular.module('drawingTool.controller', [])
         var adjustedPt = movePointOntoLine(targetPt, startPt, endPt);
         targetPt.x = adjustedPt[0];
         targetPt.y = adjustedPt[1];
-        var circle = new fabric.Circle({ radius: 5, left: targetPt.x - 5, top: targetPt.y - 5, fill: 'red' });
-        $rootScope.canvas.add(circle);
-        // $rootScope.canvas.renderAll();
-        //drawPoint(context,adjustedPt[0],adjustedPt[1],"","#00F",psize);
+        // drawPoint(context, adjustedPt[0], adjustedPt[1], "", "#00F", psize);
+        return closest_edge_index + 0.5;
+
       } else {//if didn't find any edge close to targetPt,judge for every corner to see if any corner point is close to targetPt
         for (i = 0; i < polyPt.length; i++) {
           var pt1 = [polyPt[i].x, polyPt[i].y];
@@ -239,16 +320,78 @@ angular.module('drawingTool.controller', [])
           if (dist < threshold) {//move target point to the corner
             targetPt.x = pt1[0];
             targetPt.y = pt1[1];
-            //drawPoint(context,pt1[0],pt1[1],"","#00F",psize);
-            var circle = new fabric.Circle({ radius: 5, left: targetPt.x - 5, top: targetPt.y - 5, fill: 'red' });
-            // $rootScope.canvas.add(circle);
-            $rootScope.canvas.add(circle);
-            // $rootScope.canvas.renderAll();
+            // drawPoint(context, pt1[0], pt1[1], "", "#00F", psize);
+            return i;
             break;
           }
         }
       }
+      return -1;
 
+
+    }
+    const removeExtraCirleFromCorner = (index) => {
+      if (corners[index].addedPoints.length > 2) {
+        corners[index].addedPoints.shift();
+        $rootScope.canvas.remove(corners[index].addedCricleToEdge[0]);
+        corners[index].addedCricleToEdge.shift();
+      }
+    }
+
+
+    function Judge_for_pt_on_polygon_edge(targetpt1, targetpt2, polyPt, threshold, index) {
+      debugger;
+      /*20230825 by NancyQ
+      if targetpt2 is null, only judge for targetpt1 to see if it's on the edge or close to any edge or corner of polyPt;
+      if targetpt2 is not null, which means targetpt1 is already on the edge of polyPt, judge for targetpt2 to see 
+      if it's also on any edge of polyPt or belongs to different edge from targetpt1;
+      */
+
+      var edge_index1 = adjust_pt_close_to_polygon_edge(targetpt1, polyPt, threshold);
+
+      if (targetpt2 == null) { //only judge for targetpt1 to see if it belongs to any edge, return true if it's on or close to
+        //any edge or corner point of polyPt, otherwise return false;       
+        if (edge_index1 == -1) {
+          return false;
+        } else {
+          corners[index].addedPoints.push(targetpt1);
+          var circle = new fabric.Circle({ radius: 5, left: targetpt1.x - 5, top: targetpt1.y - 5, fill: 'red' });
+          corners[index].addedCricleToEdge.push(circle);
+          $rootScope.canvas.add(circle);
+          removeExtraCirleFromCorner(index);
+          return true;
+        }
+      } else { //judge for targetpt2 to see if it belongs to any edge of polyPt, if targetpt2 is on the same edge with targetpt1
+        //return true, otherwise return false;//Get edge index of prevPt and secondPt
+        var edge_index2 = adjust_pt_close_to_polygon_edge(targetpt2, polyPt, threshold);
+
+        if (edge_index1 == -1 || edge_index2 == -1) {//if either of the points not on any edge,return false
+          return false;
+        }
+        var diff = Math.abs(edge_index1 - edge_index2);
+
+        if (diff > 1) {//not on the same edge,return false;
+          return false;
+        }
+        if (diff == 1) {
+          if (Number.isInteger(edge_index1) && Number.isInteger(edge_index2)) {//both are corner points,return true
+            corners[index].addedPoints.push(targetpt1);
+            var circle = new fabric.Circle({ radius: 5, left: targetpt1.x - 5, top: targetpt1.y - 5, fill: 'red' });
+            corners[index].addedCricleToEdge.push(circle);
+            $rootScope.canvas.add(circle);
+            removeExtraCirleFromCorner(index);
+          } else {
+            return false;
+          }
+        } else {
+          corners[index].addedPoints.push(targetpt1);
+          var circle = new fabric.Circle({ radius: 5, left: targetpt1.x - 5, top: targetpt1.y - 5, fill: 'red' });
+          corners[index].addedCricleToEdge.push(circle);
+          $rootScope.canvas.add(circle);
+          removeExtraCirleFromCorner(index);
+        }
+
+      }
 
     }
 
@@ -279,9 +422,14 @@ angular.module('drawingTool.controller', [])
         var mousePos = $rootScope.canvas.getPointer(o.e);
         debugger;
         ////SHould we use rectangles here??????? it seems that unsave corner are showing up!!!!!!!!!!!!!!
-        corners.forEach(function (corner) {
+        corners.forEach(function (corner, index) {
           debugger
-          adjust_pt_close_to_polygon_edge(mousePos, corner.shapePoints, 50)
+          if (corner.addedPoints.length > 0) {
+            Judge_for_pt_on_polygon_edge(mousePos, corner.addedPoints[0], corner.shapePoints, 50, index)
+          } else {
+            Judge_for_pt_on_polygon_edge(mousePos, null, corner.shapePoints, 50, index)
+          }
+
 
           // if (object.type === 'rect') {
           //   debugger
@@ -398,9 +546,9 @@ angular.module('drawingTool.controller', [])
               console.log(polywind(corners[i].shapePoints, rectCorners[j]))
             }
           }
-          corners.push({shapePoints: rectCorners, addedPoints: []}); //shapePoints are for the corners of the shapes and addedPoints are the one's added by the user by clicking om the edeges.
+          corners.push({ shapePoints: rectCorners, addedPoints: [], addedCricleToEdge: [] }); //shapePoints are for the corners of the shapes and addedPoints are the one's added by the user by clicking om the edeges.
         } else {
-          corners.push({shapePoints: rectCorners, addedPoints: []});
+          corners.push({ shapePoints: rectCorners, addedPoints: [], addedCricleToEdge: [] });
         }
       }
       isDown = false;
