@@ -395,6 +395,50 @@ angular.module('drawingTool.controller', [])
 
     }
 
+    $rootScope.generatePolygon = function () {
+      debugger;
+
+      corners.forEach(function (corner, index) {
+        if (corner.addedPoints.length >= 3) {
+
+          var newPolygon = new fabric.Polygon(corner.addedPoints, {
+            fill: 'rgba(255, 0, 0, 0.5)',
+
+            lockScalingX: true,
+            lockScalingY: true,
+            lockMovementX: true,
+            lockMovementY: true,
+            strokeWidth: 1
+          });
+          rectCorners = getCornersClockwise(newPolygon);
+          debugger;
+          //this is to avoide collision but it does not work for polygons
+          // for (let i = 0; i < corners.length; i++) {
+          //   for (let j = 0; j < rectCorners.length; j++) {
+          //     if (polywind(corners[i].shapePoints, rectCorners[j]) === 1 || polywind(corners[i].shapePoints, rectCorners[j]) === -1) {
+          //       //$rootScope.canvas.remove(newPolygon);
+          //       //$rootScope.canvas.renderAll();
+          //       //rectangles.pop();
+          //       return;
+          //     }
+          //     console.log(polywind(corners[i].shapePoints, rectCorners[j]))
+          //   }
+          // }
+          corners.push({ shapePoints: rectCorners, addedPoints: [], addedCricleToEdge: [] }); //shapePoints are for the corners of the shapes and addedPoints are the one's added by the user by clicking om the edeges.
+
+          $rootScope.canvas.forEachObject(function (obj) {
+            if (obj instanceof fabric.Circle) {
+              $rootScope.canvas.remove(obj);
+            }
+          });
+          $rootScope.canvas.add(newPolygon);
+          $rootScope.canvas.renderAll();
+          corners[index].addedPoints = [];
+          corners[index].addedCricleToEdge = [];
+        };
+      })
+    };
+
     $rootScope.canvas.on('mouse:down', function (o) {
       if ($rootScope.isDrawingRect) {
         isDown = true;
@@ -423,11 +467,17 @@ angular.module('drawingTool.controller', [])
         debugger;
         ////SHould we use rectangles here??????? it seems that unsave corner are showing up!!!!!!!!!!!!!!
         corners.forEach(function (corner, index) {
-          debugger
-          if (corner.addedPoints.length > 0) {
+          debugger;
+          if (corner.addedPoints.length == 1) {
             Judge_for_pt_on_polygon_edge(mousePos, corner.addedPoints[0], corner.shapePoints, 50, index)
-          } else {
+          } else if (corner.addedPoints.length == 0) {
             Judge_for_pt_on_polygon_edge(mousePos, null, corner.shapePoints, 50, index)
+          } else if (corner.addedPoints.length > 1) {
+            //added this here allow add points outside if there are more than two points on the edge
+            corners[index].addedPoints.push(mousePos);
+            var circle = new fabric.Circle({ radius: 5, left: mousePos.x - 5, top: mousePos.y - 5, fill: 'red' });
+            corners[index].addedCricleToEdge.push(circle);
+            $rootScope.canvas.add(circle);
           }
 
 
