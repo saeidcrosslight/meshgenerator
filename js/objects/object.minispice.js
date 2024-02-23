@@ -190,12 +190,15 @@ angular
                 str += "-2.000000000000000E-004\n";
                 str += "-2.000000000000000E-004\n";
                 str += "-2.000000000000000E-004\n";
-                str += "basic_box_info\n2\n4 1\n"
+                str += "basic_box_info\n2\n4 1\n";
                 str += "1pol\n"
                 str += rec1
                 str += "4 2\n"
-                str += "2pol\n"
+                str += "2polc"
                 str += rec2;
+                str += "basic_bound_info\n"
+                str += "0"
+
                 debugger;
                 return str;
 
