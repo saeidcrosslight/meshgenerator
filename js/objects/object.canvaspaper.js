@@ -42,7 +42,6 @@ angular
 
                     },
                     _canvas: function(){
-                        debugger
                         var canvas = new fabric.Canvas('drawingContainer',{
                             width: 1500,
                             height: 2000,

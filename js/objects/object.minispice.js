@@ -119,7 +119,6 @@ angular
             };
 
             const inside = (point) => {
-                debugger;
                 let isInside = false
                 for (let i = 0; i < $rootScope.boxCorners.length; i++) {
                     isInside = point.x > $rootScope.boxCorners[i].left && point.x < $rootScope.boxCorners[i].right && point.y > $rootScope.boxCorners[i].top && point.y < $rootScope.boxCorners[i].bottom;
@@ -132,7 +131,6 @@ angular
             };
 
             let saveCreatedStructure = function (projectPath, projectName, data, fileExtension) {
-                debugger;
                 if (projectName && projectPath.length > 0) {
                     var filePath = projectPath + "\\" + projectName + "." + fileExtension;
                     //data = formatCircuitData(data);
@@ -146,10 +144,12 @@ angular
             };
 
             let createLog = function () {
-                console.log('hi')
             }
 
             const writeNewMeshFile = (order1, points1, order2, points2, rec1, rec2) => {
+                console.log(order1);
+                console.log(points1);
+
 
                 let str = "mesh_version_ged2\n";
                 str += order1.length + order2.length + "\n"
@@ -160,20 +160,19 @@ angular
                     str += "1\n"; // Add a newline and "1" after each inner loop
                 }
                 for (let i = 0; i < order2.length; i++) {
-                    debugger;
                     for (let j = 0; j < order2[i].length; j++) {
-                        str += points2[parseInt(order2[i][j]) - 1].x + " " + points2[parseInt(order1[i][j]) - 1].y + " " + String(parseInt(order2[i][j]) + points1.length) + "\n";
+                        str += points2[parseInt(order2[i][j]) - 1].x + " " + points2[parseInt(order2[i][j]) - 1].y + " " + String(parseInt(order2[i][j]) + points1.length) + "\n";
                     }
                     str += "2\n"; // Add a newline and "1" after each inner loop
                 }
                 str += "nodal_material_index_listing\n"
                 str += points1.length + points2.length + "\n"
-                console.log(str);
                 for (let i = 0; i < points1.length; i++) {
                     str += i + 1 + " " + 1 + " " + 1 + "\n"
                 }
                 for (let i = 0; i < points2.length; i++) {
                     str += i + 1 + points2.length + " " + 2 + " " + 2 + "\n"
+
                 }
                 str += points1.length + points2.length + " " + 2 + "\n"
                 str += "material_type_list\n2\n"
@@ -194,18 +193,16 @@ angular
                 str += "1pol\n"
                 str += rec1
                 str += "4 2\n"
-                str += "2polc"
+                str += "2pol\n"
                 str += rec2;
                 str += "basic_bound_info\n"
                 str += "0"
 
-                debugger;
                 return str;
 
             }
 
             let saveNewCreatedStructure = function (appPath, data) {
-                debugger;
                 if (appPath.length > 0) {
                     let filePath1 = appPath + "\\" + "fort.12";
                     let filePath2 = appPath + "\\" + "fort.13";
@@ -254,7 +251,6 @@ angular
                 console.log($rootScope.boxCorners[0])
                 console.log($rootScope.boxCorners[1])
 
-                debugger;
                 let trianglesFilePath = appPath + '\\out2.txt';
 
                 let trianglesFileContent = file.readallsync(trianglesFilePath);
@@ -300,7 +296,6 @@ angular
                     $rootScope.canvas.add(line3);
                 }
 
-                debugger;
                 let trianglesFilePath2 = appPath + '\\out2_2.txt';
 
                 let trianglesFileContent2 = file.readallsync(trianglesFilePath2);
@@ -358,11 +353,9 @@ angular
 
             let formatPointsData = function (data) {
                 let str = "";
-                debugger
                 for (let i = 0; i < data.length; i++) {
                     str += data[i].x.toExponential() + " " + data[i].y.toExponential() + "\r\n"
                 }
-                debugger
                 return str;
             };
 

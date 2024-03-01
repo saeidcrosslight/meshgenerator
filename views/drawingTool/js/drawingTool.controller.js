@@ -29,7 +29,6 @@ angular.module('drawingTool.controller', [])
         
 
         $rootScope.drawRectangular = function(){
-            debugger;
             for(let i=0; i<$scope.rectangular.numberOfBoxes; i++){
                 var rect = new fabric.Rect({
                     left: 200,
@@ -41,9 +40,9 @@ angular.module('drawingTool.controller', [])
                     fill: 'rgba(0,0,0,0)'
                     });
                     console.log(rect);
-                    debugger;
             $rootScope.canvas.add(rect);
             let coordinations = [];
+            debugger;
             let points = pointsInBetween(rect.aCoords.tl, rect.aCoords.tr, 10).concat(pointsInBetween(rect.aCoords.bl, rect.aCoords.br, 10));
             points = points.concat(pointsInBetween(rect.aCoords.tl, rect.aCoords.bl, 10));
             points = points.concat(pointsInBetween(rect.aCoords.tr, rect.aCoords.br, 10));
@@ -62,14 +61,11 @@ angular.module('drawingTool.controller', [])
 
         $rootScope.canvas.on('mouse:down', function(event){
             console.log(event.absolutePointer);
-            debugger;
             let point = [];
              //point.push(event.absolutePointer.x);
              //point.push(event.absolutePointer.y);
-             debugger;
              //console.log(minispice.inside(event.absolutePointer, $rootScope.rectCorners))
             if(minispice.inside(event.absolutePointer)){
-                debugger;
             $rootScope.points.push(event.absolutePointer);
                console.log(event.e.clientX,event.e.clientY);
                    circ=new fabric.Circle({

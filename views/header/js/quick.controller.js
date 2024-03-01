@@ -61,7 +61,6 @@ angular.module('quick.controller', [])
                     });
                 },
                 saveStructure = function (){
-                    debugger;
                     //minispice.saveCreatedStructure(minispice.projectPath, minispice.projectName, $rootScope.points, '12')
                     minispice.saveNewCreatedStructure(minispice.appPath, $rootScope.points)
                 },
@@ -71,7 +70,6 @@ angular.module('quick.controller', [])
                 }
 
                 userSettingFunction = function (product, chooseID, appPathID, helpPath) {
-                    debugger;
                     $("#userSettingWindow").modal('toggle');
                     var pj = document.querySelector(chooseID);
                     pj.addEventListener("change", function (evt) {
@@ -126,7 +124,6 @@ angular.module('quick.controller', [])
                     $("#newFilePath").val(oldFilePath + "\\");
                 };
                 $scope.newProject = function () {
-                    debugger;
                     var newName = $("#newProjectName").val(),
                             newPath = $("#newProjectPath").val().replace(/\\/g, '\\\\');
                             minispice.newPath = newPath;
@@ -164,7 +161,6 @@ angular.module('quick.controller', [])
                     //minispice.enableSaveButton();
                 };
                 createRect = function () {
-                    debugger;
                     // switchToDrawingTool();
                     $("#createCubeWindow").modal('show');
                 },
