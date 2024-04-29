@@ -1,85 +1,136 @@
 angular.module('drawingTool.controller', [])
 
-    .controller('drawingToolController', ['$scope', '$timeout', '$rootScope', 'canvaspaper', function($scope, $timeout, $rootScope, canvaspaper) {
+    .controller('drawingToolController', ['$scope', '$timeout', '$rootScope', 'canvaspaper', function ($scope, $timeout, $rootScope, canvaspaper) {
         var paper = canvaspaper.createCanvasPaper();
         let minispice = $rootScope.minispice;
         // $rootScope.boxCorners = [];
-        $rootScope.rectCorners = {left: 0, right:0, top:0, bottom:0};
+        $rootScope.rectCorners = { left: 0, right: 0, top: 0, bottom: 0 };
         $rootScope.boxCorners = [];
-         $rootScope.canvas = new fabric.Canvas('drawingContainer',{
+        $rootScope.canvas = new fabric.Canvas('drawingContainer', {
             width: 1500,
             height: 2000,
             backgroundColor: 'gray'
         });
-        $rootScope.rectangular = {width:0, height:0, numberOfBoxes:0}
+        $rootScope.rectangular = { width: 0, height: 0, numberOfBoxes: 0 }
         $rootScope.points = [];
 
-        const pointsInBetween = (startPoint, endPoint, numPoints)=>{
+        const pointsInBetween = (startPoint, endPoint, numPoints, verticalGap = 0) => {
             const stepSize = 1 / (numPoints + 1);
 
             // Generate the intermediate points
             const intermediatePoints = [];
+
             for (let i = 1; i <= numPoints; i++) {
-            const x = startPoint.x + i * stepSize * (endPoint.x - startPoint.x);
-            const y = startPoint.y + i * stepSize * (endPoint.y - startPoint.y);
-            intermediatePoints.push({ x, y });
+                const x = startPoint.x + i * stepSize * (endPoint.x - startPoint.x);
+                const y = startPoint.y + i * stepSize * (endPoint.y - startPoint.y) + verticalGap;
+                intermediatePoints.push({ x, y });
             }
             return intermediatePoints;
         }
-        
 
-        $rootScope.drawRectangular = function(){
-            for(let i=0; i<$scope.rectangular.numberOfBoxes; i++){
+        const getSidesToShrink = (index, numberOfBoxes) => {
+            if (index === 1) {
+                return "bottom"
+            } else if (index === numberOfBoxes) {
+                return "top"
+            } else {
+                return "both"
+            }
+        }
+
+
+        $rootScope.drawRectangular = function () {
+            for (let i = 0; i < $scope.rectangular.numberOfBoxes; i++) {
                 var rect = new fabric.Rect({
                     left: 200,
-                    top: 400+ i*$rootScope.rectangular.height,
+                    top: 400 + i * $rootScope.rectangular.height,
                     width: $rootScope.rectangular.width,
                     height: $rootScope.rectangular.height,
                     stroke: 'black',
                     strokeWidth: 2,
                     fill: 'rgba(0,0,0,0)'
-                    });
-                    console.log(rect);
-            $rootScope.canvas.add(rect);
-            let coordinations = [];
-            debugger;
-            let points = pointsInBetween(rect.aCoords.tl, rect.aCoords.tr, 10).concat(pointsInBetween(rect.aCoords.bl, rect.aCoords.br, 10));
-            points = points.concat(pointsInBetween(rect.aCoords.tl, rect.aCoords.bl, 10));
-            points = points.concat(pointsInBetween(rect.aCoords.tr, rect.aCoords.br, 10));
-            points.push(rect.aCoords.tl)
-            points.push(rect.aCoords.tr)
-            points.push(rect.aCoords.bl)
-            points.push(rect.aCoords.br)
-            coordinations.push(rect.aCoords.br)
-            coordinations.push(rect.aCoords.bl)
-            coordinations.push(rect.aCoords.tl)
-            coordinations.push(rect.aCoords.tr)
-            $rootScope.boxCorners.push({index: i, left:rect.left, right: rect.width+rect.left, top: rect.top, bottom: rect.top+rect.height, points:points, coords: coordinations})
-            console.log($rootScope.boxCorners)
+                });
+                console.log(rect);
+                $rootScope.canvas.add(rect);
+                let coordinations = [];
+                const sidesToShrink = getSidesToShrink(i + 1, $scope.rectangular.numberOfBoxes);
+                debugger;
+                let points = [];
+                const gap = 5;
+                const lineIntervals = 20;
+                if (sidesToShrink === "top" || sidesToShrink === "both") {
+                    points = points.concat(pointsInBetween(rect.aCoords.tl, rect.aCoords.tr, lineIntervals, gap));
+                    const newTlConer = {x: rect.aCoords.tl.x, y: rect.aCoords.tl.y+gap};
+                    const newTrConer = {x: rect.aCoords.tr.x, y: rect.aCoords.tr.y+gap};
+
+                    points.push(newTlConer)
+                    points.push(newTrConer)
+                    coordinations.push(newTlConer)
+                    coordinations.push(newTrConer)
+                } else {
+                    points = points.concat(pointsInBetween(rect.aCoords.tl, rect.aCoords.tr, lineIntervals));
+                    points.push(rect.aCoords.tl)
+                    points.push(rect.aCoords.tr)
+                    coordinations.push(rect.aCoords.tl)
+                    coordinations.push(rect.aCoords.tr)
+                }
+
+                if (sidesToShrink === "bottom" || sidesToShrink === "both") {
+                    points = points.concat(pointsInBetween(rect.aCoords.bl, rect.aCoords.br, lineIntervals, -gap));
+
+                    const newBlConer = {x: rect.aCoords.bl.x, y: rect.aCoords.bl.y-gap};
+                    const newBrConer = {x: rect.aCoords.br.x, y: rect.aCoords.br.y-gap}; 
+
+                    points.push(newBlConer)
+                    points.push(newBrConer)
+                    coordinations.push(newBlConer)
+                    coordinations.push(newBrConer)
+                } else {
+                    points = points.concat(pointsInBetween(rect.aCoords.bl, rect.aCoords.br, lineIntervals));
+                    points.push(rect.aCoords.bl)
+                    points.push(rect.aCoords.br)
+                    coordinations.push(rect.aCoords.bl)
+                    coordinations.push(rect.aCoords.br)
+                }
+
+                points = points.concat(pointsInBetween(rect.aCoords.tl, rect.aCoords.bl, lineIntervals));
+                points = points.concat(pointsInBetween(rect.aCoords.tr, rect.aCoords.br, lineIntervals));
+                // points.push(rect.aCoords.tl)
+                // points.push(rect.aCoords.tr)
+                // points.push(rect.aCoords.bl)
+                // points.push(rect.aCoords.br)
+                // coordinations.push(rect.aCoords.br)
+                // coordinations.push(rect.aCoords.bl)
+                // coordinations.push(rect.aCoords.tl)
+                // coordinations.push(rect.aCoords.tr)
+                $rootScope.boxCorners.push({ index: i, left: rect.left, right: rect.width + rect.left, top: rect.top, bottom: rect.top + rect.height, points: points, coords: coordinations })
+                debugger;
+
+                console.log($rootScope.boxCorners)
             }
         };
 
-        $rootScope.canvas.on('mouse:down', function(event){
+        $rootScope.canvas.on('mouse:down', function (event) {
             console.log(event.absolutePointer);
             let point = [];
-             //point.push(event.absolutePointer.x);
-             //point.push(event.absolutePointer.y);
-             //console.log(minispice.inside(event.absolutePointer, $rootScope.rectCorners))
-            if(minispice.inside(event.absolutePointer)){
-            $rootScope.points.push(event.absolutePointer);
-               console.log(event.e.clientX,event.e.clientY);
-                   circ=new fabric.Circle({
-                       left:event.absolutePointer.x,
-                       top:event.absolutePointer.y,
-                       radius:3,
-                       stroke:'red',
-                       strokeWidth:1,
-                       fill:'red'
-                   });
+            //point.push(event.absolutePointer.x);
+            //point.push(event.absolutePointer.y);
+            //console.log(minispice.inside(event.absolutePointer, $rootScope.rectCorners))
+            if (minispice.inside(event.absolutePointer)) {
+                $rootScope.points.push(event.absolutePointer);
+                console.log(event.e.clientX, event.e.clientY);
+                circ = new fabric.Circle({
+                    left: event.absolutePointer.x,
+                    top: event.absolutePointer.y,
+                    radius: 3,
+                    stroke: 'red',
+                    strokeWidth: 1,
+                    fill: 'red'
+                });
                 $rootScope.canvas.add(circ);
             }
-           });
-        
+        });
+
 
         //create a rectangle object
         // var rect = new fabric.Rect({
