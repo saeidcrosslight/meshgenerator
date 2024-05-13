@@ -57,12 +57,16 @@ angular.module('drawingTool.controller', [])
                 debugger;
                 let points = [];
                 const gap = 5;
-                const lineIntervals = 20;
+                const lineIntervals = 30;
                 if (sidesToShrink === "top" || sidesToShrink === "both") {
+                    points = points.concat(pointsInBetween(rect.aCoords.tl, rect.aCoords.tr, lineIntervals));
                     points = points.concat(pointsInBetween(rect.aCoords.tl, rect.aCoords.tr, lineIntervals, gap));
-                    const newTlConer = {x: rect.aCoords.tl.x, y: rect.aCoords.tl.y+gap};
-                    const newTrConer = {x: rect.aCoords.tr.x, y: rect.aCoords.tr.y+gap};
-
+                    const newTlConer = { x: rect.aCoords.tl.x, y: rect.aCoords.tl.y + gap };
+                    const newTrConer = { x: rect.aCoords.tr.x, y: rect.aCoords.tr.y + gap };
+                    points.push(rect.aCoords.tl)
+                    points.push(rect.aCoords.tr)
+                    coordinations.push(rect.aCoords.tl)
+                    coordinations.push(rect.aCoords.tr)
                     points.push(newTlConer)
                     points.push(newTrConer)
                     coordinations.push(newTlConer)
@@ -77,10 +81,15 @@ angular.module('drawingTool.controller', [])
 
                 if (sidesToShrink === "bottom" || sidesToShrink === "both") {
                     points = points.concat(pointsInBetween(rect.aCoords.bl, rect.aCoords.br, lineIntervals, -gap));
+                    points = points.concat(pointsInBetween(rect.aCoords.bl, rect.aCoords.br, lineIntervals));
 
-                    const newBlConer = {x: rect.aCoords.bl.x, y: rect.aCoords.bl.y-gap};
-                    const newBrConer = {x: rect.aCoords.br.x, y: rect.aCoords.br.y-gap}; 
 
+                    const newBlConer = { x: rect.aCoords.bl.x, y: rect.aCoords.bl.y - gap };
+                    const newBrConer = { x: rect.aCoords.br.x, y: rect.aCoords.br.y - gap };
+                    points.push(rect.aCoords.bl)
+                    points.push(rect.aCoords.br)
+                    coordinations.push(rect.aCoords.bl)
+                    coordinations.push(rect.aCoords.br)
                     points.push(newBlConer)
                     points.push(newBrConer)
                     coordinations.push(newBlConer)
