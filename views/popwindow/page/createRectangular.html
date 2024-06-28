@@ -7,27 +7,78 @@
                     <h4 class="modal-title">Create Rectangular</h4>
                 </div>
                 <div class="modal-body">
-                            <form name="editCircuitComponentForm" id ="editCircuitComponent" class="css-form">
-                                <div class='row'>
-                                    <div class="form-group col-sm-3">
-                                        <label>Height </label>
-                                        <input style="width:100px;" class="form-control" type="number" ng-model="rectangular.height" /><br />
-                                    </div>
-                                    <div class="form-group col-sm-3">
-                                        <label>width </label>
-                                        <input style="width:100px;" class="form-control" type="number" ng-model="rectangular.width" /><br />
-                                    </div>
-                                    <div class="form-group col-sm-3">
-                                        <label>number of boxes </label>
-                                        <input style="width:100px;" class="form-control" type="number" ng-model="rectangular.numberOfBoxes" /><br />
-                                    </div>
+                    <form name="editCircuitComponentForm" id="editCircuitComponent" class="css-form">
+                        <div class='row'>
+                            <div class="form-group col-sm-3">
+                                <label>Height</label>
+                                <input style="width:100px;" class="form-control" type="number" ng-model="rectangular.height" /><br />
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label>Width</label>
+                                <input style="width:100px;" class="form-control" type="number" ng-model="rectangular.width" /><br />
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label>Number of boxes</label>
+                                <input style="width:100px;" class="form-control" type="number" ng-model="rectangular.numberOfBoxes"
+                                    ng-change="updateBoxes(rectangular.numberOfBoxes)" /><br />
+                            </div>
+                        </div>
+                        <div ng-repeat="box in rectangular.boxes track by $index">
+                            <label>Material:</label><br />
+                            <div class='row'>
+                                <div class="form-group col-sm-6">
+                                    <select class="form-control" ng-model="box.selectedTestMaterial"
+                                        ng-options="material.name for material in materialArray1 | orderBy:'name'"
+                                        ng-change="updateColumnsData($index)" required>
+                                        <option value="">- Please Choose material -</option>
+                                    </select>
                                 </div>
-                            </form>
+                                <div class="form-group col-sm-6">
+                                    <button type="button" class="btn btn-default" ng-click="expand()">Show/hide Material
+                                        Description</button>
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class="form-group col-sm-12">
+                                    <textarea ng-show="isMaterialInfoVisible" style="width: 400px; height: 150px"
+                                        ng-bind="box.selectedTestMaterial.info"></textarea>
+                                </div>
+                            </div><br />
+                            <div class='row' ng-if="box.selectedTestMaterial.symbol1">
+                                <div class="form-group col-sm-3">
+                                    <label>Variable {{box.selectedTestMaterial.symbol1}}:</label>
+                                    <input class="form-control" type="number" ng-required="box.selectedTestMaterial.symbol1"
+                                        ng-model="box.selectedTestMaterial.symbol1Value" min="0" max="1" />
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label style="padding-top: 25px">
+                                        Activate Grading
+                                        <input ng-model="box.selectedTestMaterial.symbol1ActiveGrading" ng-init="false" type="checkbox">
+                                    </label>
+                                </div>
+                                <div class="form-group col-sm-3" ng-if="box.selectedTestMaterial.symbol1ActiveGrading">
+                                    <label>Grading From:</label>
+                                    <input class="form-control" type="number" ng-required="box.selectedTestMaterial.symbol1ActiveGrading"
+                                        ng-disabled="!box.selectedTestMaterial.symbol1ActiveGrading"
+                                        ng-model="box.selectedTestMaterial.symbol1ValueFrom" min="0" max="1" />
+                                </div>
+                                <div class="form-group col-sm-3" ng-if="box.selectedTestMaterial.symbol1ActiveGrading">
+                                    <label>Grading To:</label>
+                                    <input class="form-control" type="number" ng-required="box.selectedTestMaterial.symbol1ActiveGrading"
+                                        ng-disabled="!box.selectedTestMaterial.symbol1ActiveGrading"
+                                        ng-model="box.selectedTestMaterial.symbol1ValueTo" min="0" max="1" />
+                                </div>
+                            </div><br />
+                        </div>
+                    </form>
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" ng-disabled="" ng-click="drawRectangular()" value="Save" class="btn btn-default">Save</button>
-                    <button type="button" ng-click="reset('selectedComponentToModify')" value="Reset" class="btn btn-default">Reset</button>
+                    <button type="button" ng-disabled="" ng-click="drawRectangular()" value="Save"
+                        class="btn btn-default">Save</button>
+                    <button type="button" ng-click="reset('selectedComponentToModify')" value="Reset"
+                        class="btn btn-default">Reset</button>
                 </div>
             </div>
         </div>

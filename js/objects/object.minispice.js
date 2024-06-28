@@ -3,8 +3,9 @@
 angular
     .module('object.minispice', [])
     .factory('minispice', ['$rootScope', 'filetree', 'editor', 'file', 'childprocess', 'paper', function ($rootScope, filetrees, editor, file, childprocess, paper) {
-        //var scene, renderer, camera, controls, morefile, macfile;
-        //var fs = require('fs');
+        var macfile;
+        var morefile;
+        var fs = require('fs');
         var factory = {};
 
         var MiniSpice = (function () {
@@ -56,6 +57,7 @@ angular
                     this.togglePaper = function () {
                         return this._togglePaper();
                     };
+                    this.materialInfo = readCrosslightAndMoreFile();
                 },
 
                 _createPaper: function () {
@@ -86,6 +88,72 @@ angular
 
                 }
 
+            };
+
+            const readCrosslightFile =  function (){
+
+                macfile =fs.readFileSync('./src/crosslight.mac', 'utf8');
+                morefile =fs.readFileSync('./src/more.mac', 'utf8');
+            };
+
+            const populateMaterialCombo = function (materialFileContent) {
+                var extractedArr = materialFileContent.match(/(?:material_lib)([^]+?)(?:end_library)/g);
+                var materialArr = [];
+                var colors = ["#C9D743","#C7E721","#A6AE9D","#2C7182","#6D71E9","#DB2A36","#DFEC71","#E188F1","#52ED36","#0947A2","#18E321","#A019D8","#ABA23A","#49C26F","#979DF4","#00CE3F","#0E017D","#92845C","#EA5ACC","#A64333","#743437","#33644E","#1E0A26","#700DBD","#953E97","#11B55E","#D913D6","#2F42A7","#8188E3","#689962","#083CE9","#BB3CF0","#31084B","#FDC76B","#BC446A","#663A31","#3ED7BD","#7EF873","#3710F8","#BA4FFA","#A61E05","#043DBF","#B3EAC5","#EFCF0B","#7C6CC5","#76B95B","#E5023B","#1EFF9B","#57B16B","#DE73B3","#82A3C0","#FA50D9","#BF8BE1","#74826F","#E3E679","#90C438","#433A30","#4FFCBE","#D22659","#53C394","#D34988","#1DB48F","#5CF48A","#36C5C1","#F15B5F","#0224BB","#CD8820","#87C7B5","#1FBE48","#03A5FF","#40274E","#21BBAD","#C25891","#EB0AA5","#2A9C08","#C48ECD","#DEE8A9","#66BBF5","#CD1C8B","#1B6A76","#34AC37","#A06980","#2F6DA6","#37344C","#06760F","#C43716","#EB644F","#56EB49","#1715C5","#2CB93C","#801C82","#27D9B2","#8187CD","#0E4241","#76E301","#09215A","#38111D","#39EC1B","#92AD4E","#FC5D05","#F0F114","#B5CD6D","#A97868","#3FADDF","#CCB2AB","#79B6BD","#B62749","#5E3C79","#5B8095","#F52A7C","#6F6261","#F1829C","#CEAFB1","#91C215","#80BAB3","#622C48","#E4A673","#232C3E","#EDFBF0","#171C1D","#F8F254","#B3859F","#9B3C87","#A74923","#93BB0C","#80573A","#CEE447","#4D389C","#F334D6","#86A32B","#0AB52E","#0EDE31","#67FA08","#70CA49","#1C0B02","#60D260","#16EE52","#FCAE7A","#7EA48E","#EABF5B","#2BCFE2","#0F9FDE","#1DBBC2","#540099","#F73B78","#694393","#692F80","#E9D959","#BBECB7","#5BF866"];
+                extractedArr.forEach(function (item,index) {
+                    var material = {};
+                    material.info = item;
+                    material.color= colors[index]
+                    if(item.indexOf("name")>-1){
+                        var nameIndex = item.indexOf("name");
+                        var firsSpaceIndex = nameIndex + item.substring(nameIndex).indexOf(" ");
+                        material.name = item.substring(nameIndex +5,firsSpaceIndex);
+                        // problem with crosslight.mac file not having space after sapphire
+                        material.name = material.name.replace("$", "");
+                        if(item.indexOf("var_symbol1")>-1){
+                            var symbol1Index = item.indexOf("var_symbol1");
+                            firsSpaceIndex = symbol1Index + item.substring(symbol1Index).indexOf(" ");
+                            var firsNewLineIndex = symbol1Index + item.substring(symbol1Index).indexOf("\r\n");
+                            if(firsSpaceIndex<firsNewLineIndex){
+                                material.symbol1 = item.substring(symbol1Index +12,firsSpaceIndex);
+                                // problem with crosslight.mac file having # after symbol1
+                                material.symbol1 = material.symbol1.replace("#", "");
+                            } else if(firsSpaceIndex>firsNewLineIndex){
+                                material.symbol1 = item.substring(symbol1Index +12,firsNewLineIndex);
+                                material.symbol1 = material.symbol1.replace("#", "");
+                            }
+                        }
+                        if(item.indexOf("var_symbol2")>-1){
+                            var symbol2Index = item.indexOf("var_symbol2");
+                            firsSpaceIndex = symbol2Index + item.substring(symbol2Index).indexOf(" ");
+                            firsNewLineIndex = symbol2Index + item.substring(symbol2Index).indexOf("\r\n");
+                            if(firsSpaceIndex<firsNewLineIndex){
+                                material.symbol2 = item.substring(symbol2Index +12,firsSpaceIndex);
+                            } else if(firsSpaceIndex>firsNewLineIndex){
+                                material.symbol2 = item.substring(symbol2Index +12,firsNewLineIndex);
+                            }
+                        }
+                        if(item.indexOf("var_symbol3")>-1){
+                            var symbol3Index = item.indexOf("var_symbol3");
+                            firsSpaceIndex = symbol3Index + item.substring(symbol3Index).indexOf(" ");
+                            firsNewLineIndex = symbol3Index + item.substring(symbol3Index).indexOf("\r\n");
+                            if(firsSpaceIndex<firsNewLineIndex){
+                                material.symbol3 = item.substring(symbol3Index +12,firsSpaceIndex);
+                            } else if(firsSpaceIndex>firsNewLineIndex){
+                                material.symbol3 = item.substring(symbol3Index +12,firsNewLineIndex);
+                            }
+
+                        }
+                        materialArr.push(material);
+                    }
+                })
+                return materialArr;
+            };
+
+            const readCrosslightAndMoreFile = function () {
+                readCrosslightFile();
+                var allText = morefile + macfile;
+                return populateMaterialCombo(allText);
             };
 
             let createProject = function (projectName, projectPath, fileTypes) {

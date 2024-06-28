@@ -4,6 +4,8 @@ angular.module('drawingTool.controller', [])
         var paper = canvaspaper.createCanvasPaper();
         let minispice = $rootScope.minispice;
         // $rootScope.boxCorners = [];
+        $scope.materialArray1 = angular.copy(minispice.materialInfo);
+        $scope.materialArray2 = angular.copy(minispice.materialInfo);
         $rootScope.rectCorners = { left: 0, right: 0, top: 0, bottom: 0 };
         $rootScope.boxCorners = [];
         $rootScope.canvas = new fabric.Canvas('drawingContainer', {
@@ -11,8 +13,26 @@ angular.module('drawingTool.controller', [])
             height: 2000,
             backgroundColor: 'gray'
         });
-        $rootScope.rectangular = { width: 0, height: 0, numberOfBoxes: 0 }
+        $rootScope.rectangular = { width: 0, height: 0, numberOfBoxes: 0, boxes: [] }
         $rootScope.points = [];
+
+        $scope.updateBoxes = function(num) {
+            $scope.rectangular.boxes = [];
+            for (let i = 0; i < num; i++) {
+                $scope.rectangular.boxes.push({});
+            }
+        };
+
+        $scope.getNumber = function(num) {
+            return new Array(num);
+        };
+
+        $scope.$watch('rectangular.numberOfBoxes', function(newVal) {
+            if (newVal) {
+                $scope.updateBoxes(newVal);
+            }
+        });
+        
 
         const pointsInBetween = (startPoint, endPoint, numPoints, verticalGap = 0) => {
             const stepSize = 1 / (numPoints + 1);
@@ -38,8 +58,13 @@ angular.module('drawingTool.controller', [])
             }
         }
 
+        $scope.expand = function () {
+            this.isMaterialInfoVisible = this.isMaterialInfoVisible ? false : true;
+        };
+
 
         $rootScope.drawRectangular = function () {
+            debugger;
             for (let i = 0; i < $scope.rectangular.numberOfBoxes; i++) {
                 var rect = new fabric.Rect({
                     left: 200,
